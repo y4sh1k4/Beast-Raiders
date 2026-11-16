@@ -1,0 +1,24 @@
+# Render Blueprint: Beast Raiders API (https://render.com/docs/blueprint-spec)
+# The server imports ../shared, so it builds from the repo root.
+services:
+  - type: web
+    name: beast-raiders-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: cd server && npm ci
+    startCommand: cd server && npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ALLOW_DEMO
+        value: "true"
+      - key: BEASTS_ADDRESS
+        value: "0x2e2f3e29a04f92c2b4e8b91fa846d521aea2a682e490bdf46f18da6d0a8bbe1"
+      - key: GEM_ADDRESS
+        value: "0x0654329ce90f8f2a986a10be40faa1982ce6837d8fa70030a7617eabe30e77fb"
+      - key: STARKNET_RPC_URL
+        sync: false   # entered in the Render dashboard
+      - key: SIGNER_PRIVATE_KEY
+        sync: false   # secret: entered in the Render dashboard, never committed
