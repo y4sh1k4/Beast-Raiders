@@ -1,0 +1,545 @@
+{
+ "species": [
+  {
+   "id": 1,
+   "name": "Warlock",
+   "tier": 1,
+   "type": "Magic"
+  },
+  {
+   "id": 2,
+   "name": "Typhon",
+   "tier": 1,
+   "type": "Magic"
+  },
+  {
+   "id": 3,
+   "name": "Jiangshi",
+   "tier": 1,
+   "type": "Magic"
+  },
+  {
+   "id": 4,
+   "name": "Anansi",
+   "tier": 1,
+   "type": "Magic"
+  },
+  {
+   "id": 5,
+   "name": "Basilisk",
+   "tier": 1,
+   "type": "Magic"
+  },
+  {
+   "id": 6,
+   "name": "Gorgon",
+   "tier": 2,
+   "type": "Magic"
+  },
+  {
+   "id": 7,
+   "name": "Kitsune",
+   "tier": 2,
+   "type": "Magic"
+  },
+  {
+   "id": 8,
+   "name": "Lich",
+   "tier": 2,
+   "type": "Magic"
+  },
+  {
+   "id": 9,
+   "name": "Chimera",
+   "tier": 2,
+   "type": "Magic"
+  },
+  {
+   "id": 10,
+   "name": "Wendigo",
+   "tier": 2,
+   "type": "Magic"
+  },
+  {
+   "id": 11,
+   "name": "Rakshasa",
+   "tier": 3,
+   "type": "Magic"
+  },
+  {
+   "id": 12,
+   "name": "Werewolf",
+   "tier": 3,
+   "type": "Magic"
+  },
+  {
+   "id": 13,
+   "name": "Banshee",
+   "tier": 3,
+   "type": "Magic"
+  },
+  {
+   "id": 14,
+   "name": "Draugr",
+   "tier": 3,
+   "type": "Magic"
+  },
+  {
+   "id": 15,
+   "name": "Vampire",
+   "tier": 3,
+   "type": "Magic"
+  },
+  {
+   "id": 16,
+   "name": "Goblin",
+   "tier": 4,
+   "type": "Magic"
+  },
+  {
+   "id": 17,
+   "name": "Ghoul",
+   "tier": 4,
+   "type": "Magic"
+  },
+  {
+   "id": 18,
+   "name": "Wraith",
+   "tier": 4,
+   "type": "Magic"
+  },
+  {
+   "id": 19,
+   "name": "Sprite",
+   "tier": 4,
+   "type": "Magic"
+  },
+  {
+   "id": 20,
+   "name": "Kappa",
+   "tier": 4,
+   "type": "Magic"
+  },
+  {
+   "id": 21,
+   "name": "Fairy",
+   "tier": 5,
+   "type": "Magic"
+  },
+  {
+   "id": 22,
+   "name": "Leprechaun",
+   "tier": 5,
+   "type": "Magic"
+  },
+  {
+   "id": 23,
+   "name": "Kelpie",
+   "tier": 5,
+   "type": "Magic"
+  },
+  {
+   "id": 24,
+   "name": "Pixie",
+   "tier": 5,
+   "type": "Magic"
+  },
+  {
+   "id": 25,
+   "name": "Gnome",
+   "tier": 5,
+   "type": "Magic"
+  },
+  {
+   "id": 26,
+   "name": "Griffin",
+   "tier": 1,
+   "type": "Hunter"
+  },
+  {
+   "id": 27,
+   "name": "Manticore",
+   "tier": 1,
+   "type": "Hunter"
+  },
+  {
+   "id": 28,
+   "name": "Phoenix",
+   "tier": 1,
+   "type": "Hunter"
+  },
+  {
+   "id": 29,
+   "name": "Dragon",
+   "tier": 1,
+   "type": "Hunter"
+  },
+  {
+   "id": 30,
+   "name": "Minotaur",
+   "tier": 1,
+   "type": "Hunter"
+  },
+  {
+   "id": 31,
+   "name": "Qilin",
+   "tier": 2,
+   "type": "Hunter"
+  },
+  {
+   "id": 32,
+   "name": "Ammit",
+   "tier": 2,
+   "type": "Hunter"
+  },
+  {
+   "id": 33,
+   "name": "Nue",
+   "tier": 2,
+   "type": "Hunter"
+  },
+  {
+   "id": 34,
+   "name": "Skinwalker",
+   "tier": 2,
+   "type": "Hunter"
+  },
+  {
+   "id": 35,
+   "name": "Chupacabra",
+   "tier": 2,
+   "type": "Hunter"
+  },
+  {
+   "id": 36,
+   "name": "Weretiger",
+   "tier": 3,
+   "type": "Hunter"
+  },
+  {
+   "id": 37,
+   "name": "Wyvern",
+   "tier": 3,
+   "type": "Hunter"
+  },
+  {
+   "id": 38,
+   "name": "Roc",
+   "tier": 3,
+   "type": "Hunter"
+  },
+  {
+   "id": 39,
+   "name": "Harpy",
+   "tier": 3,
+   "type": "Hunter"
+  },
+  {
+   "id": 40,
+   "name": "Pegasus",
+   "tier": 3,
+   "type": "Hunter"
+  },
+  {
+   "id": 41,
+   "name": "Hippogriff",
+   "tier": 4,
+   "type": "Hunter"
+  },
+  {
+   "id": 42,
+   "name": "Fenrir",
+   "tier": 4,
+   "type": "Hunter"
+  },
+  {
+   "id": 43,
+   "name": "Jaguar",
+   "tier": 4,
+   "type": "Hunter"
+  },
+  {
+   "id": 44,
+   "name": "Satori",
+   "tier": 4,
+   "type": "Hunter"
+  },
+  {
+   "id": 45,
+   "name": "Direwolf",
+   "tier": 4,
+   "type": "Hunter"
+  },
+  {
+   "id": 46,
+   "name": "Bear",
+   "tier": 5,
+   "type": "Hunter"
+  },
+  {
+   "id": 47,
+   "name": "Wolf",
+   "tier": 5,
+   "type": "Hunter"
+  },
+  {
+   "id": 48,
+   "name": "Mantis",
+   "tier": 5,
+   "type": "Hunter"
+  },
+  {
+   "id": 49,
+   "name": "Spider",
+   "tier": 5,
+   "type": "Hunter"
+  },
+  {
+   "id": 50,
+   "name": "Rat",
+   "tier": 5,
+   "type": "Hunter"
+  },
+  {
+   "id": 51,
+   "name": "Kraken",
+   "tier": 1,
+   "type": "Brute"
+  },
+  {
+   "id": 52,
+   "name": "Colossus",
+   "tier": 1,
+   "type": "Brute"
+  },
+  {
+   "id": 53,
+   "name": "Balrog",
+   "tier": 1,
+   "type": "Brute"
+  },
+  {
+   "id": 54,
+   "name": "Leviathan",
+   "tier": 1,
+   "type": "Brute"
+  },
+  {
+   "id": 55,
+   "name": "Tarrasque",
+   "tier": 1,
+   "type": "Brute"
+  },
+  {
+   "id": 56,
+   "name": "Titan",
+   "tier": 2,
+   "type": "Brute"
+  },
+  {
+   "id": 57,
+   "name": "Nephilim",
+   "tier": 2,
+   "type": "Brute"
+  },
+  {
+   "id": 58,
+   "name": "Behemoth",
+   "tier": 2,
+   "type": "Brute"
+  },
+  {
+   "id": 59,
+   "name": "Hydra",
+   "tier": 2,
+   "type": "Brute"
+  },
+  {
+   "id": 60,
+   "name": "Juggernaut",
+   "tier": 2,
+   "type": "Brute"
+  },
+  {
+   "id": 61,
+   "name": "Oni",
+   "tier": 3,
+   "type": "Brute"
+  },
+  {
+   "id": 62,
+   "name": "Jotunn",
+   "tier": 3,
+   "type": "Brute"
+  },
+  {
+   "id": 63,
+   "name": "Ettin",
+   "tier": 3,
+   "type": "Brute"
+  },
+  {
+   "id": 64,
+   "name": "Cyclops",
+   "tier": 3,
+   "type": "Brute"
+  },
+  {
+   "id": 65,
+   "name": "Giant",
+   "tier": 3,
+   "type": "Brute"
+  },
+  {
+   "id": 66,
+   "name": "Nemean Lion",
+   "tier": 4,
+   "type": "Brute"
+  },
+  {
+   "id": 67,
+   "name": "Berserker",
+   "tier": 4,
+   "type": "Brute"
+  },
+  {
+   "id": 68,
+   "name": "Yeti",
+   "tier": 4,
+   "type": "Brute"
+  },
+  {
+   "id": 69,
+   "name": "Golem",
+   "tier": 4,
+   "type": "Brute"
+  },
+  {
+   "id": 70,
+   "name": "Ent",
+   "tier": 4,
+   "type": "Brute"
+  },
+  {
+   "id": 71,
+   "name": "Troll",
+   "tier": 5,
+   "type": "Brute"
+  },
+  {
+   "id": 72,
+   "name": "Bigfoot",
+   "tier": 5,
+   "type": "Brute"
+  },
+  {
+   "id": 73,
+   "name": "Ogre",
+   "tier": 5,
+   "type": "Brute"
+  },
+  {
+   "id": 74,
+   "name": "Orc",
+   "tier": 5,
+   "type": "Brute"
+  },
+  {
+   "id": 75,
+   "name": "Skeleton",
+   "tier": 5,
+   "type": "Brute"
+  }
+ ],
+ "prefixes": [
+  "Agony",
+  "Apocalypse",
+  "Armageddon",
+  "Beast",
+  "Behemoth",
+  "Blight",
+  "Blood",
+  "Bramble",
+  "Brimstone",
+  "Brood",
+  "Carrion",
+  "Cataclysm",
+  "Chimeric",
+  "Corpse",
+  "Corruption",
+  "Damnation",
+  "Death",
+  "Demon",
+  "Dire",
+  "Dragon",
+  "Dread",
+  "Doom",
+  "Dusk",
+  "Eagle",
+  "Empyrean",
+  "Fate",
+  "Foe",
+  "Gale",
+  "Ghoul",
+  "Gloom",
+  "Glyph",
+  "Golem",
+  "Grim",
+  "Hate",
+  "Havoc",
+  "Honour",
+  "Horror",
+  "Hypnotic",
+  "Kraken",
+  "Loath",
+  "Maelstrom",
+  "Mind",
+  "Miracle",
+  "Morbid",
+  "Oblivion",
+  "Onslaught",
+  "Pain",
+  "Pandemonium",
+  "Phoenix",
+  "Plague",
+  "Rage",
+  "Rapture",
+  "Rune",
+  "Skull",
+  "Sol",
+  "Soul",
+  "Sorrow",
+  "Spirit",
+  "Storm",
+  "Tempest",
+  "Torment",
+  "Vengeance",
+  "Victory",
+  "Viper",
+  "Vortex",
+  "Woe",
+  "Wrath",
+  "Lights",
+  "Shimmering"
+ ],
+ "suffixes": [
+  "Bane",
+  "Root",
+  "Bite",
+  "Song",
+  "Roar",
+  "Grasp",
+  "Instrument",
+  "Glow",
+  "Bender",
+  "Shadow",
+  "Whisper",
+  "Shout",
+  "Growl",
+  "Tear",
+  "Peak",
+  "Form",
+  "Sun",
+  "Moon"
+ ]
+}

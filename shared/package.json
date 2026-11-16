@@ -1,0 +1,6 @@
+{
+  "name": "beast-raiders-shared",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test \"*.test.mjs\"" }
+}

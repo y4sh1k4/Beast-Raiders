@@ -1,0 +1,26 @@
+node_modules/
+.env
+.env.*
+!.env.example
+accounts.json
+*.key
+contracts/target/
+contracts/.snfoundry_cache/
+web/dist/
+server/data.json
+.DS_Store
+beast/
+
+# original downloads (installed copies live in .claude/skills)
+beast-raiders-kit/
+.claude/.skills/
+
+# local tooling / editor
+.claude/settings.local.json
+.starknet_accounts/
+.vscode/
+.idea/
+*.log
+npm-debug.log*
+coverage/
+*.tsbuildinfo

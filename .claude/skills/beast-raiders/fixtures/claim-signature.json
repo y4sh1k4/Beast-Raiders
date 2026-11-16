@@ -1,0 +1,14 @@
+{
+  "note": "Test-only key. Message = poseidon_hash_span([contract, player, amount.low, amount.high, nonce])",
+  "private_key": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+  "public_key": "0x4838c4ed86f1c9b4fe1aac884ac79431b0243b79d9e24500eb0f6229f4fe72a",
+  "contract": "0x1111",
+  "player": "0x2222",
+  "amount": "250000000000000000000",
+  "amount_low": "0xd8d726b7177a80000",
+  "amount_high": "0x0",
+  "nonce": "0x7777",
+  "message_hash": "0x53797057446d1a19e0c5261f942006c54d12b6b61a03d086ae74a52bdaf95f9",
+  "r": "0x2d6a3935a80cc8469287c8b209867fca1a7d9816c6f3146ab9851e9be79085",
+  "s": "0x6e8ff1b8bb21721f8b6dcfb5a0ad5a2f98a9d8c67a869a6bf8cca36f7a89a6c"
+}
