@@ -389,3 +389,8 @@ main { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; paddin
 .end-lost { color: #ff6b6b; text-shadow: 3px 3px 0 #5a0000, 6px 6px 0 #000; }
 
 .bottom-row { display: flex; gap: 10px; justify-content: center; }
+
+/* unclaimed winnings pill in the HUD */
+.claim-pill { animation: claim-pulse 1.6s ease-in-out infinite; }
+@keyframes claim-pulse { 0%, 100% { box-shadow: 0 0 0 0 #ffd54a00; } 50% { box-shadow: 0 0 14px 2px #ffd54aaa; } }
+@media (prefers-reduced-motion: reduce) { .claim-pill { animation: none; } }

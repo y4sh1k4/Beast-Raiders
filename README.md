@@ -29,7 +29,7 @@ Send one of your Beasts into a 5×5 dungeon. Each safe tile you reveal raises yo
 5. **Cash out.** You get `stake × multiplier`. The server signs the reward and you claim it on-chain.
 6. **Verify fairness ✅.** Your browser rebuilds the board from the revealed seed and checks it.
 
-Each Beast gets 3 runs (Stamina) per day. There is also a daily leaderboard and a +100 GEM faucet. If your wallet holds no Beasts, a demo Beast can play practice runs, but it can't stake or claim.
+Each Beast gets 3 runs (Stamina) per day. There is also a daily leaderboard and a +100 GEM faucet. If your wallet holds no Beasts, the **Practice Arena** lends you real Sepolia Beasts with no stamina limit. With a wallet connected you stake and win real testnet GEM there too. Without one, practice raids are free play.
 
 ## 🔐 Provably fair
 

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { verifyRun, multiplier as calcMultiplier, beats, BASE_REWARD } from '../../shared/engine.mjs'
 import {
-  api, beastImage, claimCalldata, connectWallet, findWallets, formatGem, invoke, isMuted, randomClientSeed,
+  api, beastImage, claimCalldata, connectWallet, findWallets, formatGem, invoke, invokeMany, isMuted, randomClientSeed,
   setMuted, sfx, short, transferCalldata, wholeGem,
-  type Beast, type Config, type Revealed, type Score, type View, type Wallet,
+  type Beast, type Config, type PendingClaim, type Revealed, type Score, type View, type Wallet,
 } from './lib'
 
 const GEM_ADDRESS = (import.meta.env.VITE_GEM_ADDRESS as string | undefined) || null
@@ -44,6 +44,8 @@ export default function App() {
   const [toast, setToast] = useState<{ text: string; kind: 'info' | 'err' } | null>(null)
   const [muted, setMutedState] = useState(isMuted())
   const [scores, setScores] = useState<Score[]>([])
+  const [pending, setPending] = useState<PendingClaim[]>([])
+  const [claimingAll, setClaimingAll] = useState(false)
 
   const gemAddress = GEM_ADDRESS ?? config?.gemAddress ?? null
 
@@ -68,6 +70,22 @@ export default function App() {
     try { const r = await api<{ balance: string | null }>(`/api/gem/${addr}`); setGem(r.balance); return r.balance } catch { return null }
   }, [address, gemAddress])
 
+  const refreshClaims = useCallback(async (addr = address) => {
+    if (!addr || !gemAddress) return
+    try { setPending(await api<PendingClaim[]>(`/api/claims/${addr}`)) } catch { /* keep last list */ }
+  }, [address, gemAddress])
+  useEffect(() => { refreshClaims() }, [refreshClaims, view?.status])
+
+  /** Poll the GEM balance until it moves away from `before` (the chain needs a few seconds). */
+  const waitForGem = useCallback(async (before: string | null, tries = 40) => {
+    for (let i = 0; i < tries; i++) {
+      await new Promise((r) => setTimeout(r, 3000))
+      const now = await refreshGem()
+      if (now !== null && now !== before) return now
+    }
+    return null
+  }, [refreshGem])
+
   const loadBeasts = useCallback(async (addr: string) => {
     setLoadingBeasts(true)
     try { setBeasts(await api<Beast[]>(`/api/beasts?owner=${addr}`)) } catch (e) { say(`Could not read your beasts: ${(e as Error).message}`, 'err'); setBeasts([]) }
@@ -82,7 +100,7 @@ export default function App() {
       const w = ws[0]
       const addr = await connectWallet(w)
       setWallet(w); setAddress(addr)
-      loadBeasts(addr); refreshGem(addr)
+      loadBeasts(addr); refreshGem(addr); refreshClaims(addr)
     } catch (e) { say((e as Error).message, 'err') }
   }
 
@@ -91,12 +109,23 @@ export default function App() {
     const before = gem
     const hash = await invoke(wallet, gemAddress, entry, calldata)
     say(`Tx sent ${short(hash)}: waiting for the chain…`)
-    for (let i = 0; i < 40; i++) {
-      await new Promise((r) => setTimeout(r, 4000))
-      const now = await refreshGem()
-      if (now !== null && now !== before) return hash
-    }
+    await waitForGem(before)
     return hash
+  }
+
+  const claimAll = async () => {
+    if (!wallet || !gemAddress || !pending.length || claimingAll) return
+    setClaimingAll(true)
+    try {
+      const total = pending.reduce((s, c) => s + c.reward, 0)
+      const before = gem
+      const hash = await invokeMany(wallet, gemAddress, 'claim', pending.map((c) => claimCalldata(c.claim)))
+      say(`Claiming 💎${total} (${short(hash)}): waiting for the chain…`)
+      await waitForGem(before)
+      sfx.cash(); say(`+💎${total} GEM landed in your wallet!`)
+      await refreshClaims()
+    } catch (e) { say((e as Error).message, 'err') }
+    setClaimingAll(false)
   }
 
   const faucet = async () => {
@@ -108,17 +137,18 @@ export default function App() {
   const startRun = async (beast: Beast, difficulty: DungeonKey, clientSeed: string, stake: number) => {
     try {
       let stakeTx: string | undefined
-      if (!beast.demo && stakesLive) {
+      if (stakesLive && (!beast.demo || wallet)) {
         if (!wallet || !gemAddress || !config?.houseAddress) throw new Error('Connect your wallet to stake GEM')
         if (stake > wholeGem(gem)) throw new Error(`You only have ${formatGem(gem)} GEM. Use the +100 faucet.`)
         stakeTx = await invoke(wallet, gemAddress, 'transfer', transferCalldata(config.houseAddress, stake))
         say(`Stake of 💎${stake} sent (${short(stakeTx)}). Waiting for the chain to confirm…`)
       }
       const body = beast.demo
-        ? { demo: true, tokenId: beast.tokenId, clientSeed, difficulty, stake }
+        ? { demo: true, tokenId: beast.tokenId, clientSeed, difficulty, stake, ...(stakeTx ? { owner: address, stakeTx } : {}) }
         : { owner: address, tokenId: beast.tokenId, clientSeed, difficulty, stake, stakeTx }
+      const before = gem
       const v = await api<View>('/api/runs', body)
-      if (stakeTx) refreshGem()
+      if (stakeTx) void waitForGem(before, 10) // stake left the wallet: show it as soon as the RPC catches up
       store.set(RUN_KEY, v.runId)
       sfx.start()
       setView(v)
@@ -150,6 +180,12 @@ export default function App() {
               <button className="btn-mini" onClick={faucet} title="Daily faucet: 100 GEM">+100</button>
             </div>
           )}
+          {address && pending.length > 0 && (
+            <button className="btn btn-gold btn-sm claim-pill" onClick={claimAll} disabled={claimingAll}
+              title={pending.map((c) => `💎${c.reward} · ${c.name}`).join('\n')}>
+              {claimingAll ? 'Claiming…' : `🎁 Claim 💎${pending.reduce((s, c) => s + c.reward, 0)}`}
+            </button>
+          )}
           {address
             ? <div className="wallet-chip"><span className="dot" />{short(address)}</div>
             : <button className="btn btn-gold btn-sm" onClick={connect}>Connect wallet</button>}
@@ -166,7 +202,7 @@ export default function App() {
             initial={view}
             address={address}
             canClaim={Boolean(config?.claims && wallet && gemAddress)}
-            onClaim={async (v) => { if (!v.claim) return; await sendTx('claim', claimCalldata(v.claim)); sfx.cash() }}
+            onClaim={async (v) => { if (!v.claim) return; await sendTx('claim', claimCalldata(v.claim)); sfx.cash(); refreshClaims() }}
             onLeave={leaveRun}
             onAgain={(v) => {
               const pool = v.demo ? showcase : beasts
@@ -177,7 +213,7 @@ export default function App() {
           />
         ) : selected ? (
           <Gate beast={selected} onBack={() => setSelected(null)} onEnter={startRun}
-            live={!selected.demo && stakesLive} balance={wholeGem(gem)}
+            live={stakesLive && (!selected.demo || Boolean(wallet))} balance={wholeGem(gem)}
             minStake={config?.minStake ?? 1} maxStake={config?.maxStake ?? 1000} />
         ) : (
           <Camp
@@ -232,7 +268,7 @@ function Camp({ address, beasts, loading, demoBeast, showcase, onConnect, onPick
             {beasts?.map((b) => <BeastCard key={b.tokenId} beast={b} onPick={() => onPick(b)} />)}
           </div>
           {address && beasts && beasts.length === 0 && !loading && (
-            <p className="hint">No Beasts in this wallet yet. Train with a real Beast from the Practice Arena below (no GEM rewards).</p>
+            <p className="hint">No Beasts in this wallet yet. Raid with a real Beast from the Practice Arena below and stake GEM for real.</p>
           )}
           <PracticeArena showcase={showcase} fallback={demoBeast} onPick={onPick} />
         </div>
@@ -254,7 +290,7 @@ function PracticeArena({ showcase, fallback, onPick }: { showcase: Beast[] | nul
       <div className="arena-head">
         <div>
           <h2 className="section-title">⚔ Practice Arena</h2>
-          <p className="arena-sub">Real Beasts from the Sepolia collection with their true on-chain Level, Health, Tier and Type. Raid freely: no stamina, no GEM.</p>
+          <p className="arena-sub">Real Beasts from the Sepolia collection with their true on-chain Level, Health, Tier and Type. No stamina limit. Connect a wallet to stake and win real GEM, or raid for free without one.</p>
         </div>
         {list && (
           <div className="chips">
@@ -316,7 +352,7 @@ function BeastCard({ beast, onPick }: { beast: Beast; onPick: () => void }) {
           <div className="kit-row" title="Loot multiplier bonus (from Tier)"><span className="kit-label">LOOT</span><span className="kit-val gold">×{k.tierBonus.toFixed(2)}</span></div>
         </div>
         <div className="card-foot">
-          {beast.demo ? <span className="demo-tag">PRACTICE · no GEM</span> : (
+          {beast.demo ? <span className="demo-tag">PRACTICE · ∞ raids</span> : (
             <span className="stamina" title="Raids left today">
               <Pips n={beast.staminaLeft} max={3} icon="⚡" cls="stam" />
             </span>
@@ -747,7 +783,7 @@ function EndScreen({ view, address, canClaim, onClaim, onLeave, onAgain, onHide 
     try { await onClaim(view); setClaimState('done') } catch (e) { setClaimState('err'); setClaimErr((e as Error).message) }
   }
 
-  const isOwner = address && view.beast.tokenId // server signed the claim for the beast's owner
+  const isOwner = Boolean(address) // server signed the claim for the wallet that staked (or the beast's owner)
   return (
     <div className="end-overlay">
       <div className={`end-panel ${won ? 'end-win' : 'end-lose'}`}>
@@ -761,12 +797,15 @@ function EndScreen({ view, address, canClaim, onClaim, onLeave, onAgain, onHide 
         {!won && <div className="end-reward end-lost">−💎 {view.stake} <span>GEM{view.staked ? ' lost' : ' (practice)'}</span></div>}
 
         {won && (
-          !view.staked ? <p className="end-note">Practice raids don't pay GEM. Connect a wallet that owns a Beast to stake for real.</p>
+          !view.staked ? <p className="end-note">This was a free raid. Connect a wallet and stake GEM to win for real.</p>
             : view.claim && canClaim && isOwner ? (
               <button className="btn btn-gold btn-lg" onClick={doClaim} disabled={claimState === 'busy' || claimState === 'done'}>
                 {claimState === 'busy' ? 'Signing & minting…' : claimState === 'done' ? '✔ GEM claimed!' : `Claim ${reward} GEM on Starknet`}
               </button>
             ) : <p className="end-note">{view.claim ? 'Connect the owner wallet to claim.' : 'GEM rewards are not enabled on this server yet.'}</p>
+        )}
+        {won && view.staked && view.claim && claimState !== 'done' && (
+          <p className="end-note">Your winnings reach your wallet once you claim. Missed it? Use 🎁 Claim at the top right.</p>
         )}
         {claimState === 'err' && <p className="end-err">{claimErr}</p>}
 

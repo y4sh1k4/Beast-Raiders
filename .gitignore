@@ -24,3 +24,6 @@ beast-raiders-kit/
 npm-debug.log*
 coverage/
 *.tsbuildinfo
+
+# unclaimed signed rewards (runtime state)
+server/claims.json

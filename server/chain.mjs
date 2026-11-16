@@ -60,6 +60,11 @@ export async function speciesTokenIds(speciesId) {
   return felts.slice(1).map((f) => BigInt(f).toString());
 }
 
+export async function isNonceUsed(nonce) {
+  const [r] = await call(READ_RPCS, process.env.GEM_ADDRESS, 'is_nonce_used', [nonce]);
+  return BigInt(r) !== 0n;
+}
+
 export async function gemBalance(address) {
   if (!process.env.GEM_ADDRESS) return null;
   const [lo, hi] = await call(READ_RPCS, process.env.GEM_ADDRESS, 'balance_of', [address]);

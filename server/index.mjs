@@ -8,8 +8,9 @@ import {
 import { beastFromTokenId, DEMO_BEAST } from '../shared/beast.mjs';
 import {
   ownerOf, beastsOf, gemBalance, tokenMetadata, signClaim, claimsEnabled, normAddr, speciesTokenIds,
-  verifyStakeTx, houseAddress,
+  verifyStakeTx, houseAddress, isNonceUsed,
 } from './chain.mjs';
+import fs from 'node:fs';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const ALLOW_DEMO = process.env.ALLOW_DEMO !== 'false';
@@ -47,6 +48,15 @@ function recordScore(entry) {
   const prev = board.get(key);
   if (!prev || prev.day !== today() || entry.reward > prev.reward) board.set(key, { ...entry, day: today() });
 }
+
+// ---------- unclaimed winnings (persisted so a restart or a closed tab never loses a win) ----------
+
+const CLAIMS_FILE = new URL('./claims.json', import.meta.url);
+const pendingClaims = new Map(); // nonce -> { player, reward, name, claim, at }
+try { for (const c of JSON.parse(fs.readFileSync(CLAIMS_FILE, 'utf8'))) pendingClaims.set(c.claim.nonce, c); } catch { /* none yet */ }
+const saveClaims = () => {
+  try { fs.writeFileSync(CLAIMS_FILE, JSON.stringify([...pendingClaims.values()], null, 2)); } catch (e) { console.error('claims save failed', e.message); }
+};
 
 // ---------- beasts ----------
 
@@ -177,6 +187,8 @@ app.post('/api/runs', async (req, res) => {
   let beast, ownerAddr = null, id = null;
   if (demo) {
     if (!ALLOW_DEMO) throw new HttpError(403, 'demo disabled');
+    // A connected wallet can stake real (testnet) GEM on practice beasts; it is paid as the player.
+    if (owner !== undefined && owner !== null) ownerAddr = parseAddr(owner);
     if (tokenId !== undefined && tokenId !== null) {
       // Only real beasts from the showcase: stops crafted token IDs with fake max stats.
       id = parseTokenId(tokenId);
@@ -196,8 +208,9 @@ app.post('/api/runs', async (req, res) => {
     try { beast = beastFromTokenId(id); } catch (e) { throw bad(e.message); }
   }
 
-  // Real GEM is on the line only for owned beasts when the reward contract is live.
-  const staked = !demo && claimsEnabled();
+  // Real GEM is on the line whenever a wallet plays and the reward contract is live:
+  // owned beasts pay their owner, practice beasts pay the staking player.
+  const staked = Boolean(ownerAddr) && claimsEnabled();
   let txKey = null;
   if (staked) {
     if (typeof stakeTx !== 'string' || !/^0x[0-9a-fA-F]{1,64}$/.test(stakeTx)) throw bad('stakeTx required: transfer your stake to the house first');
@@ -237,7 +250,11 @@ function settle(entry) {
   const reward = entry.beast.community ? Math.min(raw, entry.stake) : raw;
   entry.reward = reward;
   entry.multiplier = multiplier;
-  if (!entry.demo && claimsEnabled() && reward > 0) entry.claim = signClaim({ player: entry.owner, rewardGem: reward });
+  if (entry.staked && reward > 0) {
+    entry.claim = signClaim({ player: entry.owner, rewardGem: reward });
+    pendingClaims.set(entry.claim.nonce, { player: entry.owner, reward, name: entry.beast.fullName, claim: entry.claim, at: Date.now() });
+    saveClaims();
+  }
   recordScore({ tokenId: entry.tokenId, name: entry.beast.fullName, typeName: entry.beast.typeName, owner: entry.owner, demo: entry.demo, stake: entry.stake, multiplier, reward });
 }
 
@@ -259,6 +276,21 @@ app.post('/api/runs/:id/flee', (req, res) => {
   const entry = getRun(req.params.id);
   if (entry.run.status === 'active') { entry.run.status = 'lost'; entry.fled = true; }
   res.json({ result: { fled: true }, view: viewOf(entry) });
+});
+
+// Signed but not yet minted winnings for a wallet. Drops any whose nonce is already used on-chain.
+app.get('/api/claims/:address', async (req, res) => {
+  const addr = parseAddr(req.params.address);
+  const mine = [...pendingClaims.values()].filter((c) => c.player === addr);
+  const open = [];
+  let changed = false;
+  for (const c of mine) {
+    let used = false;
+    try { used = await isNonceUsed(c.claim.nonce); } catch { /* RPC hiccup: keep it listed */ }
+    if (used) { pendingClaims.delete(c.claim.nonce); changed = true; } else open.push(c);
+  }
+  if (changed) saveClaims();
+  res.json(open.map(({ reward, name, claim, at }) => ({ reward, name, claim, at })));
 });
 
 app.get('/api/runs/:id', (req, res) => res.json({ view: viewOf(getRun(req.params.id)) }));

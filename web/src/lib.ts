@@ -110,6 +110,17 @@ export async function invoke(wallet: Wallet, contract: string, entrypoint: strin
   return res.transaction_hash;
 }
 
+/** Several calls on one contract in a single transaction (one wallet approval). */
+export async function invokeMany(wallet: Wallet, contract: string, entrypoint: string, calldatas: string[][]): Promise<string> {
+  const res = await wallet.request({
+    type: 'wallet_addInvokeTransaction',
+    params: { calls: calldatas.map((calldata) => ({ contract_address: contract, entry_point: entrypoint, calldata })) },
+  });
+  return res.transaction_hash;
+}
+
+export type PendingClaim = { reward: number; name: string; claim: Claim; at: number };
+
 export function claimCalldata(c: Claim): string[] {
   const a = BigInt(c.amount);
   const U128 = (1n << 128n) - 1n;
